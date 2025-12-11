@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ekthaa — Mobile Prototype</title>
+  <style>
+    /* Mobile-first styles for Ekthaa prototype */
+    :root{
+      --bg:#0a1120;
+      --card:#111c32;
+      --muted:#8fa2c8;
+      --accent:#22c55e;
+      --accent-soft:#34d399;
+      --purple:#8b9bff;
+      --orange:#ff8c42;
+      --glass: rgba(255,255,255,0.04);
+      --low-red: rgba(255,80,80,0.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;color:#e6eef6;background:linear-gradient(180deg,#071021 0%, #071827 100%);}    
+    .phone{width:360px;max-width:100%;margin:18px auto;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#06101a,#071627);box-shadow:0 20px 40px rgba(2,6,23,0.6);position:relative;}    
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);}    
+    .brand{display:flex;gap:10px;align-items:center}    
+    .logo{width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#4fd1c5);display:grid;place-items:center;color:#04231f;font-weight:700}    
+    h1{font-size:16px;margin:0}    
+    .search{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);color:var(--muted);width:100%}
+
+    main{padding:12px;padding-bottom:120px} /* extra bottom padding so content isn't hidden by nav */
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}    
+
+    /* INVENTORY STYLES */
+    .inv-summary{background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .inv-summary .left{flex:1}
+    .inv-summary .label{font-size:11px;color:var(--muted);letter-spacing:0.6px}
+    .inv-summary .value{font-size:22px;font-weight:800;margin-top:6px}
+    .low-count{color:#ff6b6b;font-weight:800}
+
+    .tabs{display:flex;gap:10px;margin-bottom:12px}
+    .tab{padding:8px 12px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.03);font-weight:700;color:var(--muted);cursor:pointer}
+    .tab.active{background:linear-gradient(90deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));color:#eaf7ee}
+    .tab.low{color:#ff6b6b;border-color:rgba(255,107,107,0.12)}
+
+    .inv-list{display:flex;flex-direction:column;gap:12px}
+    .inv-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.03)}
+    .inv-item.low{background:var(--low-red)}
+    .inv-left{display:flex;flex-direction:column;max-width:60%}
+    .inv-name{font-weight:800}
+    .inv-unit{font-size:13px;color:var(--muted);margin-top:6px}
+    .counter{display:flex;align-items:center;gap:8px}
+    .counter button{width:36px;height:36px;border-radius:8px;border:none;font-weight:800;cursor:pointer}
+    .dec{background:transparent;border:2px solid rgba(255,80,80,0.9);color:#ff5252}
+    .inc{background:linear-gradient(90deg,#22c55e,#34d399);color:#04231f}
+    .qty{min-width:56px;text-align:center;font-weight:800}
+
+    /* Add button that sits on top of the bottom nav */
+    .add-top-btn{position:absolute;left:50%;transform:translateX(-50%);bottom:74px;background:#2b6ef6;color:white;padding:12px 18px;border-radius:28px;border:none;box-shadow:0 12px 30px rgba(43,110,246,0.18);font-weight:800;cursor:pointer}
+
+    /* Floating FAB (kept for legacy) */
+    .inv-fab{display:none}
+
+    /* Bottom nav - fixed inside phone */
+    .bottom-nav{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-around;padding:10px 6px;background:linear-gradient(180deg,#06101a,#071627);border-top:1px solid rgba(255,255,255,0.02)}
+    .nav-item{display:flex;flex-direction:column;align-items:center;font-size:12px;color:var(--muted);cursor:pointer;padding:6px 4px}
+    .nav-item.active{color:var(--accent)}
+
+    .form-field{display:flex;flex-direction:column;margin-bottom:10px}
+    .form-field label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .form-field input{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+    @media (max-width:380px){ .phone{width:100%;border-radius:0} .grid{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+  <div style="padding:12px;text-align:center;color:var(--muted);font-size:13px">Editing prototype — Mobile view (tap items in the preview to interact)</div>
+  <div class="phone" role="region" aria-label="Ekthaa mobile preview">
+    <header>
+      <div class="brand">
+        <div class="logo">E</div>
+        <div>
+          <h1>Ekthaa</h1>
+        </div>
+      </div>
+      <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.02);display:grid;place-items:center;color:var(--muted);">☰</div>
+    </header>
+
+    <main id="main-content">
+      <!-- Default dashboard (kept minimal) -->
+      <div style="font-size:14px;color:var(--muted);text-align:center;padding:40px 12px">Tap the bottom nav to open sections. Try Inventory.</div>
+    </main>
+
+    <!-- Add button sits above the bottom nav and is visible on inventory only -->
+    <button class="add-top-btn" id="add-top-btn" onclick="showAddPage()">+ Add</button>
+
+    <nav class="bottom-nav" aria-label="bottom navigation">
+      <div class="nav-item" id="nav-credit" onclick="showDashboard()">📘<div>Credit</div></div>
+      <div class="nav-item" id="nav-inv" onclick="showInventory()">📦<div>Inventory</div></div>
+      <div class="nav-item" id="nav-inv2" onclick="showInvoices()">🧾<div>Invoices</div></div>
+      <div class="nav-item" id="nav-grow">🚀<div>Grow</div></div>
+      <div class="nav-item" id="nav-biz">⚙️<div>Business</div></div>
+    </nav>
+
+    <!-- Modal kept but hidden by default; Add page will be used instead -->
+    <div id="modal" class="modal-backdrop" role="dialog" aria-modal="true" style="display:none">
+      <div class="modal" role="document">
+        <h3 style="margin-top:0">Add product</h3>
+        <div class="field"><label>Product name</label><input id="pname" placeholder="e.g. Tata Salt" /></div>
+        <div class="field"><label>Unit</label><input id="punit" placeholder="e.g. pkt, kg, ltr" /></div>
+        <div class="row">
+          <div style="flex:1" class="field"><label>Price</label><input id="pprice" placeholder="₹" /></div>
+          <div style="flex:1" class="field"><label>Stock</label><input id="pstock" placeholder="qty" /></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+          <button onclick="closeModal()" class="btn ghost">Cancel</button>
+          <button onclick="addNewItemFromModal()" class="btn">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample inventory data
+    let inventory = [
+      {id:1,name:'Tata Salt', qty:20, unit:'pkt', price:20},
+      {id:2,name:'Maggi Noodles', qty:5, unit:'pkt', price:12},
+      {id:3,name:'Fortune Oil', qty:15, unit:'ltr', price:140}
+    ];
+    const LOW_THRESHOLD = 6; // items with qty <= this are low stock
+
+    // INVOICE DATA & LOGIC
+    let invoiceItems = [
+      {id:1, name:'Mysore Sandal Soap', qty:2, pricePerUnit:60}, // total 120
+      {id:2, name:'Toor Dal', qty:1, pricePerUnit:140} // total 140
+    ];
+    let invoiceCounter = 12; // will show Inv #0012
+    let discount = 0;
+
+    function showDashboard(){
+      setActiveNav('nav-credit');
+      document.getElementById('add-top-btn').style.display='none';
+      const main = document.getElementById('main-content');
+      main.innerHTML = `
+        <!-- Business profile card -->
+        <div style="background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);margin-bottom:12px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 24px rgba(3,9,23,0.45)">
+          <div style="width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--purple),#7a85ff);display:grid;place-items:center;font-weight:700;font-size:18px;box-shadow:0 8px 18px rgba(0,0,0,0.45)">🏪</div>
+          <div style="flex:1">
+            <div style="font-size:18px;font-weight:800">Devi kirana</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px">My business account</div>
+          </div>
+        </div>
+
+        <!-- Total to receive card -->
+        <div style="position:relative;background:linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);margin-bottom:14px;display:flex;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(3,9,23,0.45)">
+          <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#062b20,#0b3b2b);display:grid;place-items:center;color:var(--accent);font-size:20px;margin-right:8px">💵</div>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--muted);letter-spacing:0.6px">TOTAL TO RECEIVE</div>
+            <div style="font-size:22px;font-weight:800;margin-top:6px">₹93,083.00</div>
+          </div>
+          <div style="position:absolute;left:0;top:10px;bottom:10px;width:6px;background:linear-gradient(180deg,var(--accent),var(--accent-soft));border-top-left-radius:12px;border-bottom-left-radius:12px"></div>
+        </div>
+
+        <!-- Action tiles -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <a onclick="window.location.href='https://business.khatape.tech'" class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;border-radius:14px;min-height:90px;box-shadow:0 8px 22px rgba(3,9,23,0.35);cursor:pointer">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(139,155,255,0.12),rgba(139,155,255,0.06));display:grid;place-items:center;font-size:18px;color:var(--purple);margin-bottom:8px">👥</div>
+            <div style="font-weight:700">View Customers</div>
+          </a>
+
+          <a onclick="window.location.href='https://business.khatape.tech'" class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;border-radius:14px;min-height:90px;box-shadow:0 8px 22px rgba(3,9,23,0.35);cursor:pointer">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(255,140,66,0.08),rgba(255,140,66,0.04));display:grid;place-items:center;font-size:18px;color:var(--orange);margin-bottom:8px">🧾</div>
+            <div style="font-weight:700">View Transactions</div>
+          </a>
+
+          <a onclick="window.location.href='https://business.khatape.tech'" class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;border-radius:14px;min-height:90px;box-shadow:0 8px 22px rgba(3,9,23,0.35);cursor:pointer">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(52,211,153,0.08),rgba(52,211,153,0.04));display:grid;place-items:center;font-size:18px;color:var(--accent);margin-bottom:8px">➕</div>
+            <div style="font-weight:700">Add Customer</div>
+          </a>
+
+          <a onclick="window.location.href='https://business.khatape.tech'" class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;border-radius:14px;min-height:90px;box-shadow:0 8px 22px rgba(3,9,23,0.35);cursor:pointer">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,rgba(255,140,66,0.08),rgba(255,140,66,0.04));display:grid;place-items:center;font-size:18px;color:var(--orange);margin-bottom:8px">🔲</div>
+            <div style="font-weight:700">QR Code</div>
+          </a>
+        </div>
+
+        <!-- WhatsApp reminders button -->
+        <div style="margin:8px 0 84px 0;display:flex;justify-content:center">
+          <button onclick="window.location.href='https://business.khatape.tech'" style="background:linear-gradient(90deg,var(--accent),var(--accent-soft));color:#04231f;padding:14px 20px;border-radius:28px;border:none;font-weight:800;display:flex;align-items:center;gap:10px;box-shadow:0 12px 36px rgba(34,197,94,0.18)">📤 Send All Reminders</button>
+        </div>
+      `;
+    }
+
+    function showInventory(filter='all'){
+      setActiveNav('nav-inv');
+      document.getElementById('add-top-btn').style.display='block';
+      const main = document.getElementById('main-content');
+
+      // compute summary
+      const totalValue = inventory.reduce((s,i)=>s + (i.qty * i.price),0);
+      const lowCount = inventory.filter(i=>i.qty <= LOW_THRESHOLD).length;
+
+      // build list depending on filter
+      const itemsToShow = filter === 'low' ? inventory.filter(i=>i.qty <= LOW_THRESHOLD) : inventory;
+
+      main.innerHTML = `
+        <div class="inv-summary">
+          <div class="left">
+            <div class="label">TOTAL STOCK VALUE</div>
+            <div class="value">₹${totalValue.toLocaleString()}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--muted)">Low stock items</div>
+            <div class="low-count">${lowCount}</div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <div class="tab ${filter==='all'?'active':''}" onclick="showInventory('all')">All Items</div>
+          <div class="tab low ${filter==='low'?'active':''}" onclick="showInventory('low')">Low Stock</div>
+        </div>
+
+        <div class="inv-list" id="inv-list">
+          ${itemsToShow.map(i=>`
+            <div class="inv-item ${i.qty <= LOW_THRESHOLD ? 'low' : ''}" data-id="${i.id}">
+              <div class="inv-left">
+                <div class="inv-name">${i.name}</div>
+                <div class="inv-unit">₹${i.price}/${i.unit}</div>
+              </div>
+              <div class="counter">
+                <button class="dec" onclick="changeQty(${i.id}, -1)">-</button>
+                <div class="qty" id="qty-${i.id}">${i.qty} ${i.unit}</div>
+                <button class="inc" onclick="changeQty(${i.id}, 1)">+</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // new Add page (full in-frame form)
+    function showAddPage(){
+      setActiveNav(null);
+      document.getElementById('add-top-btn').style.display='block';
+      const main = document.getElementById('main-content');
+      main.innerHTML = `
+        <div style="font-size:16px;font-weight:800;margin-bottom:12px">Add New Item</div>
+        <div class="form-field"><label>Product name</label><input id="apname" placeholder="e.g. Tata Salt" /></div>
+        <div class="form-field"><label>Unit</label><input id="apunit" placeholder="e.g. pkt, kg, ltr" /></div>
+        <div class="row" style="display:flex;gap:8px;margin-bottom:12px">
+          <div style="flex:1" class="form-field"><label>Price</label><input id="apprice" placeholder="₹" /></div>
+          <div style="flex:1" class="form-field"><label>Stock</label><input id="apstock" placeholder="qty" /></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+          <button onclick="showInventory()" class="btn ghost">Cancel</button>
+          <button onclick="saveFromAddPage()" class="btn">Save</button>
+        </div>
+      `;
+    }
+
+    function saveFromAddPage(){
+      const name = document.getElementById('apname').value || 'Untitled';
+      const unit = document.getElementById('apunit').value || 'pcs';
+      const price = parseFloat(document.getElementById('apprice').value) || 0;
+      const stock = parseInt(document.getElementById('apstock').value) || 0;
+      const id = Math.max(0,...inventory.map(i=>i.id)) + 1;
+      inventory.unshift({id,name,qty:stock,unit,price});
+      showInventory();
+    }
+
+    function changeQty(id, delta){
+      const item = inventory.find(x=>x.id===id);
+      if(!item) return;
+      item.qty = Math.max(0, item.qty + delta);
+      // update UI
+      const qtyEl = document.getElementById('qty-'+id);
+      if(qtyEl) qtyEl.textContent = item.qty + ' ' + item.unit;
+      // re-render summary and low highlight
+      showInventory(document.querySelector('.tab.active') && document.querySelector('.tab.active').textContent.includes('Low') ? 'low' : 'all');
+    }
+
+    // Modal control for adding (legacy)
+    const modal = document.getElementById('modal');
+    function openModal(){ modal.style.display='flex'; }
+    function closeModal(){ modal.style.display='none'; }
+    function addNewItemFromModal(){
+      const name = document.getElementById('pname').value || 'Untitled';
+      const unit = document.getElementById('punit').value || 'pcs';
+      const price = parseFloat(document.getElementById('pprice').value) || 0;
+      const stock = parseInt(document.getElementById('pstock').value) || 0;
+      const id = Math.max(0,...inventory.map(i=>i.id)) + 1;
+      inventory.unshift({id,name,qty:stock,unit,price});
+      closeModal();
+      showInventory();
+    }
+
+    // INVOICE FUNCTIONS
+    function showInvoices(){
+      setActiveNav('nav-inv2');
+      document.getElementById('add-top-btn').style.display='none';
+      const main = document.getElementById('main-content');
+      const today = new Date().toLocaleDateString();
+      const invNumber = String(invoiceCounter).padStart(4,'0');
+
+      main.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800">Inv #${invNumber}</div>
+          <div style="font-size:12px;color:var(--muted)">${today}</div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <select id="customer-select" style="width:100%;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit">
+            <option>Cash Sale</option>
+            <option>Devi Kirana</option>
+            <option>Ramu Stores</option>
+          </select>
+        </div>
+
+        <!-- Add Item engine -->
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input id="search-prod" placeholder="Search Product..." style="flex:2;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04)" />
+          <input id="add-qty" type="number" value="1" min="1" style="width:72px;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04)" />
+          <input id="add-price" type="number" value="0" min="0" style="width:90px;padding:10px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04)" />
+          <button onclick="addInvoiceItemFromInputs()" style="background:linear-gradient(90deg,var(--accent),var(--accent-soft));color:#04231f;padding:10px 12px;border-radius:10px;border:none;font-weight:800">ADD +</button>
+        </div>
+
+        <!-- Items table -->
+        <div style="background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);margin-bottom:10px">
+          <div id="invoice-table">
+            <!-- rows inserted here -->
+          </div>
+        </div>
+
+        <!-- Calculation section -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="color:var(--muted)">Subtotal</div>
+          <div id="subtotal" style="font-weight:800">₹0</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="color:var(--muted)">Discount</div>
+          <input id="discount" type="number" value="0" min="0" style="width:120px;padding:8px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);text-align:right" />
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:80px">
+          <div style="color:var(--muted);font-weight:800">Grand Total</div>
+          <div id="grand" style="font-size:20px;font-weight:900">₹0</div>
+        </div>
+
+        <!-- Sticky action bar above nav -->
+        <div id="invoice-actions" style="position:absolute;left:0;right:0;bottom:54px;display:flex;gap:8px;padding:10px;background:linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.6));box-shadow:0 -6px 18px rgba(0,0,0,0.6)">
+          <button onclick="saveDraft()" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--muted);font-weight:700">Save Draft</button>
+          <button onclick="shareAndSave()" style="flex:1;padding:12px;border-radius:10px;border:none;background:linear-gradient(90deg,#25D366,#128C7E);color:#04231f;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px"> <i class="fa fa-whatsapp"></i> Share on WhatsApp & Save</button>
+        </div>
+      `;
+
+      // render prefilled items
+      renderInvoiceTable();
+      document.getElementById('discount').addEventListener('input', ()=>{
+        discount = parseFloat(document.getElementById('discount').value) || 0;
+        updateTotals();
+      });
+    }
+
+    function addInvoiceItemFromInputs(){
+      const name = document.getElementById('search-prod').value || 'Unnamed';
+      const qty = parseFloat(document.getElementById('add-qty').value) || 1;
+      const pricePerUnit = parseFloat(document.getElementById('add-price').value) || 0;
+      const id = Math.max(0, ...invoiceItems.map(i=>i.id)) + 1;
+      invoiceItems.push({id, name, qty, pricePerUnit});
+      renderInvoiceTable();
+      document.getElementById('search-prod').value='';
+      document.getElementById('add-qty').value='1';
+      document.getElementById('add-price').value='0';
+    }
+
+    function renderInvoiceTable(){
+      const table = document.getElementById('invoice-table');
+      if(!table) return;
+      table.innerHTML = `
+        <div style="display:flex;font-weight:800;padding:8px 6px;border-bottom:1px dashed rgba(255,255,255,0.04);">
+          <div style="flex:2">Item</div>
+          <div style="width:56px;text-align:right">Qty</div>
+          <div style="width:80px;text-align:right">Total</div>
+          <div style="width:40px"></div>
+        </div>
+        ${invoiceItems.map(it=>{
+          const total = (it.qty * it.pricePerUnit);
+          return `
+            <div style="display:flex;align-items:center;padding:10px 6px;border-bottom:1px dashed rgba(255,255,255,0.03)">
+              <div style="flex:2">
+                <div style="font-weight:800">${it.name}</div>
+              </div>
+              <div style="width:56px;text-align:right">${it.qty}</div>
+              <div style="width:80px;text-align:right">₹${total.toLocaleString()}</div>
+              <div style="width:40px;text-align:center"><button onclick=\"deleteInvoiceItem(${it.id})\" style=\"background:transparent;border:none;color:#ff6b6b;font-weight:800;cursor:pointer\">✕</button></div>
+            </div>
+          `;
+        }).join('')}
+      `;
+      updateTotals();
+    }
+
+    function deleteInvoiceItem(id){
+      invoiceItems = invoiceItems.filter(i=>i.id!==id);
+      renderInvoiceTable();
+    }
+
+    function updateTotals(){
+      const subtotal = invoiceItems.reduce((s,i)=>s + (i.qty * i.pricePerUnit),0);
+      const subtotalEl = document.getElementById('subtotal');
+      const grandEl = document.getElementById('grand');
+      if(subtotalEl) subtotalEl.textContent = '₹' + subtotal.toLocaleString();
+      if(grandEl) grandEl.textContent = '₹' + Math.max(0, subtotal - (discount||0)).toLocaleString();
+    }
+
+    function saveDraft(){
+      alert('Draft saved (mock)');
+    }
+
+    function shareAndSave(){
+      // mock: prepare message
+      const subtotal = invoiceItems.reduce((s,i)=>s + (i.qty * i.pricePerUnit),0);
+      const grand = Math.max(0, subtotal - (discount||0));
+      const text = `Invoice Inv #${String(invoiceCounter).padStart(4,'0')} - Total: ₹${grand}`;
+      // using whatsapp web intent
+      const url = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(text);
+      window.open(url, '_blank');
+    }
+
+    // nav helpers
+    function setActiveNav(id){
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      if(id){ const el = document.getElementById(id); if(el) el.classList.add('active'); }
+    }
+
+    // wire initial view
+    showDashboard();
+  </script>
+
+  <!-- load Font Awesome for WhatsApp icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
